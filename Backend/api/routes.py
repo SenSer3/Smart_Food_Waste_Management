@@ -1,7 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel, EmailStr
 from Backend.model.food_alternative_model import FoodAlternativeModel
-from Backend.supabase_client import supabase
+from Backend.model.waste_prediction_model import WastePredictionModel
+from fastapi import Body
+from fastapi.responses import JSONResponse
+import datetime
+from supabase_client import supabase
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Optional, List
@@ -11,6 +15,9 @@ router = APIRouter()
 
 # Load the food alternative model
 food_model = FoodAlternativeModel('Backend/database/nutrition_data.csv')
+
+# Load the waste prediction model
+waste_prediction_model = WastePredictionModel('Backend/model/best_lasso_model.pkl')
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -171,3 +178,20 @@ def get_menu_alternatives(request: MenuRequest):
     except Exception as e:
         logger.error(f"Error in get_menu_alternatives: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@router.post('/waste-prediction')
+def waste_prediction(
+    user_id: str = Body(...),
+    recent_waste: list = Body(...),
+    menu_items: list = Body(...),
+    day_of_week: int = Body(...)
+):
+    """
+    Predict waste quantity based on recent waste, menu items, and day of week.
+    """
+    try:
+        result = waste_prediction_model.get_prediction_and_analysis(user_id, recent_waste, menu_items, day_of_week)
+        return JSONResponse(content=result)
+    except Exception as e:
+        logger.error(f"Error in waste_prediction: {e}")
+        return JSONResponse(status_code=500, content={"error": str(e)})

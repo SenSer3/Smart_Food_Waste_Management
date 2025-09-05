@@ -4,3 +4,7 @@ __pycache__/
 
 # Ignore pytest cache directory
 .pytest_cache/
+
+# Roadmap files
+supabase.txt
+analysis_plan.txt

@@ -17,7 +17,6 @@ class FoodAlternativeModel:
             self.nutrition_data.columns = cols
         self.food_names = self.nutrition_data['food_name'].values
         # Select nutritional columns for similarity comparison
-        # 'food_source' column not found, drop only 'food_code' and 'food_name'
         self.nutrition_features = self.nutrition_data.drop(columns=['food_code', 'food_name'])
         # Store nutrient names from original columns excluding 'food_code' and the second column (food_name)
         self.nutrient_names = [col for col in original_cols if col not in ['food_code', original_cols[1]]]

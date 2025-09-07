@@ -14,10 +14,10 @@ import logging
 router = APIRouter()
 
 # Load the food alternative model
-food_model = FoodAlternativeModel('database/nutrition_data.csv')
+food_model = FoodAlternativeModel('Backend/database/nutrition_data.csv')
 
 # Load the waste prediction model
-waste_prediction_model = WastePredictionModel('model/best_lasso_model.pkl')
+waste_prediction_model = WastePredictionModel('Backend/model/best_lasso_model.pkl', 'Backend/lasso_preprocessor.joblib')
 
 logger = logging.getLogger("uvicorn.error")
 

@@ -8,3 +8,6 @@ __pycache__/
 # Roadmap files
 supabase.txt
 analysis_plan.txt
+
+test_all_endpoints.py
+test_all_endpoints_updated.py

@@ -6,14 +6,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import base64
 from io import BytesIO
-from Backend.supabase_client import supabase
+# from Backend.supabase_client import supabase
 import logging
 
 logger = logging.getLogger("uvicorn.error")
 
 class WastePredictionModel:
-    def __init__(self, lasso_model_path):
+    def __init__(self, lasso_model_path, preprocessor_path='lasso_preprocessor.joblib'):
         self.lasso_model = joblib.load(lasso_model_path)
+        self.preprocessor = joblib.load(preprocessor_path)
         self.logger = logger
 
     def prepare_features(self, recent_waste, menu_items, day_of_week):
@@ -85,19 +86,56 @@ class WastePredictionModel:
         return feature_df
 
     def predict_waste(self, features):
-        # Make prediction using lasso model
-        prediction = self.lasso_model.predict(features)
-        return prediction[0]
+        """
+        Make prediction using the flexible lasso model that can handle any number of features.
+        This function fills missing columns with defaults to match the trained model's expectations.
+        """
+        # Get the expected columns from the preprocessor
+        expected_num_cols = self.preprocessor.named_transformers_['num'].feature_names_in_
+        expected_cat_cols = self.preprocessor.named_transformers_['cat'].feature_names_in_
+
+        # Fill missing columns with defaults
+        for col in expected_num_cols:
+            if col not in features.columns:
+                features[col] = 0  # Default for numerical
+
+        for col in expected_cat_cols:
+            if col not in features.columns:
+                features[col] = 'unknown'  # Default for categorical
+
+        # Ensure columns are in the correct order
+        all_expected_cols = list(expected_num_cols) + list(expected_cat_cols)
+        features = features[all_expected_cols]
+
+        # Preprocess the input data
+        try:
+            X_processed = self.preprocessor.transform(features)
+        except Exception as e:
+            self.logger.error(f"Error in preprocessing: {e}")
+            raise ValueError(f"Error in preprocessing: {e}")
+
+        # Make predictions
+        predictions = self.lasso_model.predict(X_processed)
+        return predictions[0]
 
     def get_historical_data(self, user_id, days=30):
-        # Fetch historical wastage data from Supabase
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=days)
-        response = supabase.table("wastage_records").select("*").eq("user_id", user_id).gte("date", start_date.isoformat()).execute()
-        if response.get("error"):
-            self.logger.error(f"Error fetching historical data: {response['error']}")
-            return []
-        return response.get("data", [])
+        # Supabase commented out - returning mock data for testing
+        # end_date = datetime.now()
+        # start_date = end_date - timedelta(days=days)
+        # response = supabase.table("wastage_records").select("*").eq("user_id", user_id).gte("date", start_date.isoformat()).execute()
+        # if response.get("error"):
+        #     self.logger.error(f"Error fetching historical data: {response['error']}")
+        #     return []
+        # return response.get("data", [])
+
+        # Mock data for testing
+        mock_data = [
+            {"date": "2024-01-01", "food_item": "chicken", "quantity": 2.5},
+            {"date": "2024-01-02", "food_item": "rice", "quantity": 1.0},
+            {"date": "2024-01-03", "food_item": "chicken", "quantity": 3.0},
+            {"date": "2024-01-04", "food_item": "potato", "quantity": 1.5},
+        ]
+        return mock_data
 
     def analyze_trends(self, historical_data):
         # Analyze trends from historical data

@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel, EmailStr
-from Backend.model.food_alternative_model import FoodAlternativeModel
-from Backend.model.waste_prediction_model import WastePredictionModel
+from model.food_alternative_model import FoodAlternativeModel
+from model.waste_prediction_model import WastePredictionModel
 from fastapi import Body
 from fastapi.responses import JSONResponse
 import datetime
-from supabase_client import supabase
+# from supabase_client import supabase
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Optional, List
@@ -14,10 +14,10 @@ import logging
 router = APIRouter()
 
 # Load the food alternative model
-food_model = FoodAlternativeModel('Backend/database/nutrition_data.csv')
+food_model = FoodAlternativeModel('database/nutrition_data.csv')
 
 # Load the waste prediction model
-waste_prediction_model = WastePredictionModel('Backend/model/best_lasso_model.pkl')
+waste_prediction_model = WastePredictionModel('model/best_lasso_model.pkl')
 
 logger = logging.getLogger("uvicorn.error")
 

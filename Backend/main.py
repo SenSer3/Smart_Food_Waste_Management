@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 import joblib
 from api.routes import router as api_router
@@ -19,4 +20,5 @@ app.include_router(api_router)
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host='0.0.0.0', port=8002)
+    port = int(os.environ.get('PORT', 8000))
+    uvicorn.run(app, host='0.0.0.0', port=port)

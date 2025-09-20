@@ -5,7 +5,8 @@ from model.waste_prediction_model import WastePredictionModel
 from fastapi import Body
 from fastapi.responses import JSONResponse
 import datetime
-# from supabase_client import supabase
+import logging
+from supabase_client import supabase
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Optional, List
@@ -13,11 +14,19 @@ import logging
 
 router = APIRouter()
 
+logger = logging.getLogger("uvicorn.error")
+
 # Load the food alternative model
-food_model = FoodAlternativeModel('Backend/database/nutrition_data.csv')
+food_model = FoodAlternativeModel('database/nutrition_data.csv')
 
 # Load the waste prediction model
-waste_prediction_model = WastePredictionModel('Backend/model/best_lasso_model.pkl', 'Backend/lasso_preprocessor.joblib')
+try:
+    waste_prediction_model = WastePredictionModel('best_lasso_model.joblib', 'lasso_preprocessor.joblib')
+    if not hasattr(waste_prediction_model, 'lasso_model_path'):
+        raise ValueError("Model initialization failed - missing lasso_model_path")
+except Exception as e:
+    logger.error(f"Failed to initialize waste prediction model: {e}")
+    waste_prediction_model = None  # We'll handle this case in the endpoints
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -190,8 +199,25 @@ def waste_prediction(
     Predict waste quantity based on recent waste, menu items, and day of week.
     """
     try:
-        result = waste_prediction_model.get_prediction_and_analysis(user_id, recent_waste, menu_items, day_of_week)
-        return JSONResponse(content=result)
+        # Input validation
+        if not isinstance(recent_waste, list):
+            raise HTTPException(status_code=422, detail="recent_waste must be a list")
+            
+        if not isinstance(menu_items, list):
+            raise HTTPException(status_code=422, detail="menu_items must be a list")
+            
+        if not isinstance(day_of_week, int) or day_of_week < 0 or day_of_week > 6:
+            raise HTTPException(status_code=422, detail="day_of_week must be an integer between 0 and 6 inclusive")
+            
+        # Get prediction from the model
+        prediction_result = waste_prediction_model.get_prediction_and_analysis(
+            user_id, recent_waste, menu_items, day_of_week
+        )
+        
+        return prediction_result
+        
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error in waste_prediction: {e}")
-        return JSONResponse(status_code=500, content={"error": str(e)})
+        logger.error(f"Error in waste prediction: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

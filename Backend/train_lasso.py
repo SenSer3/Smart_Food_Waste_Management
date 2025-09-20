@@ -19,6 +19,9 @@ def train_flexible_lasso_model(data_path='DataSet/train.csv', save_path='best_la
     # Step 1: Load and clean data
     df = pd.read_csv(data_path)
     df.dropna(inplace=True)
+    
+    # Drop the date column since it's not needed for predictions
+    df = df.drop(columns=['date'], errors='ignore')
 
     # Step 2: Separate features and target
     X = df.drop(columns=['food_waste_kg'], axis=1)

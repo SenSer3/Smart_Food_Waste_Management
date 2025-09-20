@@ -7,11 +7,11 @@ from model.food_alternative_model import FoodAlternativeModel
 app = FastAPI()
 
 # Load existing lasso model
-lasso_model_path = 'Backend/model/best_lasso_model.pkl'
+lasso_model_path = 'model/best_lasso_model.pkl'
 lasso_model = joblib.load(lasso_model_path)
 
 # Load food alternative model
-food_alternative_model = FoodAlternativeModel('Backend/database/nutrition_data.csv')
+food_alternative_model = FoodAlternativeModel('database/nutrition_data.csv')
 
 # Include API routes
 app.include_router(api_router)

@@ -2,10 +2,10 @@ import joblib
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
-import seaborn as sns
-import base64
-from io import BytesIO
+# import matplotlib.pyplot as plt  # Visualization disabled
+# import seaborn as sns  # Visualization disabled
+# import base64  # Visualization disabled
+# from io import BytesIO  # Visualization disabled
 from fastapi import HTTPException
 # from Backend.supabase_client import supabase
 import logging
@@ -319,54 +319,55 @@ class WastePredictionModel:
 
     def generate_visualizations(self, analysis_data):
         """Generate visualizations for waste analysis"""
-        images = {}
+        # Temporarily returning empty dict while visualizations are disabled
+        return {}
         
-        # Set style for better-looking plots
-        plt.style.use('seaborn')
+        # # Set style for better-looking plots
+        # # plt.style.use('seaborn-v0_8')  # Using the updated seaborn style name - commented out
         
-        # Line chart for weekly waste
-        if 'weekly_waste' in analysis_data:
-            plt.figure(figsize=(10, 6))
-            series = pd.Series(analysis_data['weekly_waste'])
-            ax = series.plot(kind='line', marker='o', linewidth=2)
-            plt.title('Weekly Waste Trend Analysis', fontsize=14, pad=20)
-            plt.xlabel('Week', fontsize=12)
-            plt.ylabel('Waste Quantity (kg)', fontsize=12)
-            plt.grid(True, linestyle='--', alpha=0.7)
+        # # Line chart for weekly waste
+        # if 'weekly_waste' in analysis_data:
+        #     plt.figure(figsize=(10, 6))
+        #     series = pd.Series(analysis_data['weekly_waste'])
+        #     ax = series.plot(kind='line', marker='o', linewidth=2)
+        #     plt.title('Weekly Waste Trend Analysis', fontsize=14, pad=20)
+        #     plt.xlabel('Week', fontsize=12)
+        #     plt.ylabel('Waste Quantity (kg)', fontsize=12)
+        #     plt.grid(True, linestyle='--', alpha=0.7)
             
-            # Add value labels on points
-            for i, v in enumerate(series):
-                ax.text(i, v, f'{v:.1f}', ha='center', va='bottom')
+        #     # Add value labels on points
+        #     for i, v in enumerate(series):
+        #         ax.text(i, v, f'{v:.1f}', ha='center', va='bottom')
                 
-            plt.tight_layout()
-            buf = BytesIO()
-            plt.savefig(buf, format='png', dpi=300, bbox_inches='tight')
-            buf.seek(0)
-            images['weekly_trend'] = base64.b64encode(buf.read()).decode('utf-8')
-            plt.close()
+        #     plt.tight_layout()
+        #     buf = BytesIO()
+        #     plt.savefig(buf, format='png', dpi=300, bbox_inches='tight')
+        #     buf.seek(0)
+        #     images['weekly_trend'] = base64.b64encode(buf.read()).decode('utf-8')
+        #     plt.close()
 
-        # Bar chart for waste by item
-        if 'waste_by_item' in analysis_data:
-            plt.figure(figsize=(10, 6))
-            series = pd.Series(analysis_data['waste_by_item'])
-            ax = series.plot(kind='bar', color='skyblue')
-            plt.title('Waste Analysis by Food Item', fontsize=14, pad=20)
-            plt.xlabel('Food Item', fontsize=12)
-            plt.ylabel('Total Waste Quantity (kg)', fontsize=12)
-            plt.xticks(rotation=45, ha='right')
-            plt.grid(True, axis='y', linestyle='--', alpha=0.7)
+        # # Bar chart for waste by item
+        # if 'waste_by_item' in analysis_data:
+        #     plt.figure(figsize=(10, 6))
+        #     series = pd.Series(analysis_data['waste_by_item'])
+        #     ax = series.plot(kind='bar', color='skyblue')
+        #     plt.title('Waste Analysis by Food Item', fontsize=14, pad=20)
+        #     plt.xlabel('Food Item', fontsize=12)
+        #     plt.ylabel('Total Waste Quantity (kg)', fontsize=12)
+        #     plt.xticks(rotation=45, ha='right')
+        #     plt.grid(True, axis='y', linestyle='--', alpha=0.7)
             
-            # Add value labels on bars
-            for i, v in enumerate(series):
-                ax.text(i, v, f'{v:.1f}', ha='center', va='bottom')
+        #     # Add value labels on bars
+        #     for i, v in enumerate(series):
+        #         ax.text(i, v, f'{v:.1f}', ha='center', va='bottom')
                 
-            plt.tight_layout()
-            buf = BytesIO()
-            plt.savefig(buf, format='png', dpi=300, bbox_inches='tight')
-            buf.seek(0)
-            images['waste_by_item'] = base64.b64encode(buf.read()).decode('utf-8')
-            plt.close()
+        #     plt.tight_layout()
+        #     buf = BytesIO()
+        #     plt.savefig(buf, format='png', dpi=300, bbox_inches='tight')
+        #     buf.seek(0)
+        #     images['waste_by_item'] = base64.b64encode(buf.read()).decode('utf-8')
+        #     plt.close()
 
-        return images
+        # return images
 
 

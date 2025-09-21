@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt  # Visualization disabled
 import joblib
 
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -95,18 +95,18 @@ def train_flexible_lasso_model(data_path='DataSet/train.csv', save_path='best_la
     # Step 14: Show results
     print(pred_df.head())
 
-    # Step 15: Plot alpha vs MSE
-    alphas = param_grid['alpha']
-    mse_scores = -grid_search.cv_results_['mean_test_score']
+    # Step 15: Plot alpha vs MSE - Visualization disabled
+    # alphas = param_grid['alpha']
+    # mse_scores = -grid_search.cv_results_['mean_test_score']
 
-    plt.figure(figsize=(8, 5))
-    plt.plot(alphas, mse_scores, marker='o')
-    plt.xscale('log')
-    plt.xlabel('Alpha')
-    plt.ylabel('Negative Mean Squared Error')
-    plt.title('Alpha vs MSE (Cross-validation)')
-    plt.grid(True)
-    plt.show()
+    # plt.figure(figsize=(8, 5))
+    # plt.plot(alphas, mse_scores, marker='o')
+    # plt.xscale('log')
+    # plt.xlabel('Alpha')
+    # plt.ylabel('Negative Mean Squared Error')
+    # plt.title('Alpha vs MSE (Cross-validation)')
+    # plt.grid(True)
+    # plt.show()
 
 if __name__ == "__main__":
     train_flexible_lasso_model()

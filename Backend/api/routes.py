@@ -6,7 +6,7 @@ from fastapi import Body
 from fastapi.responses import JSONResponse
 import datetime
 import logging
-from supabase_client import supabase
+# from supabase_client import supabase  # Supabase integration disabled
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Optional, List
@@ -60,94 +60,94 @@ class WastageRecord(BaseModel):
     quantity: float  # e.g. in kg or units
     notes: Optional[str] = None
 
-# Authentication endpoints
-@router.post("/signup", status_code=status.HTTP_201_CREATED)
-def signup(user: UserSignup):
-    try:
-        response = supabase.auth.sign_up({
-            "email": user.email,
-            "password": user.password
-        })
-        if response.get("error"):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response["error"]["message"])
-        return {"message": "User signed up successfully. Please check your email to confirm."}
-    except Exception as e:
-        logger.error(f"Signup error: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+# Authentication endpoints - Supabase integration disabled
+# @router.post("/signup", status_code=status.HTTP_201_CREATED)
+# def signup(user: UserSignup):
+#     try:
+#         response = supabase.auth.sign_up({
+#             "email": user.email,
+#             "password": user.password
+#         })
+#         if response.get("error"):
+#             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response["error"]["message"])
+#         return {"message": "User signed up successfully. Please check your email to confirm."}
+#     except Exception as e:
+#         logger.error(f"Signup error: {e}")
+#         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-@router.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    try:
-        response = supabase.auth.sign_in_with_password({
-            "email": form_data.username,
-            "password": form_data.password
-        })
-        if response.get("error"):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=response["error"]["message"])
-        access_token = response.get("data", {}).get("access_token")
-        if not access_token:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid login credentials")
-        return {"access_token": access_token, "token_type": "bearer"}
-    except Exception as e:
-        logger.error(f"Login error: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+# @router.post("/login")
+# def login(form_data: OAuth2PasswordRequestForm = Depends()):
+#     try:
+#         response = supabase.auth.sign_in_with_password({
+#             "email": form_data.username,
+#             "password": form_data.password
+#         })
+#         if response.get("error"):
+#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=response["error"]["message"])
+#         access_token = response.get("data", {}).get("access_token")
+#         if not access_token:
+#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid login credentials")
+#         return {"access_token": access_token, "token_type": "bearer"}
+#     except Exception as e:
+#         logger.error(f"Login error: {e}")
+#         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-# Dependency to get current user from token
-def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
-    try:
-        user_data = supabase.auth.get_user(token)
-        if user_data.get("error"):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication credentials")
-        user_info = user_data.get("data", {}).get("user")
-        if not user_info:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
-        return User(id=user_info["id"], email=user_info["email"])
-    except Exception as e:
-        logger.error(f"Get current user error: {e}")
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication credentials")
+# Dependency to get current user from token - Supabase integration disabled
+# def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+#     try:
+#         user_data = supabase.auth.get_user(token)
+#         if user_data.get("error"):
+#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication credentials")
+#         user_info = user_data.get("data", {}).get("user")
+#         if not user_info:
+#            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+#         return User(id=user_info["id"], email=user_info["email"])
+#     except Exception as e:
+#         logger.error(f"Get current user error: {e}")
+#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication credentials")
 
-# Food wastage data endpoints
-@router.post("/wastage")
-def add_wastage_record(record: WastageRecord, current_user: User = Depends(get_current_user)):
-    try:
-        data = record.dict()
-        data["user_id"] = current_user.id  # Override user_id with authenticated user
-        response = supabase.table("wastage_records").insert(data).execute()
-        if response.get("error"):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response["error"]["message"])
-        return {"message": "Wastage record added successfully"}
-    except Exception as e:
-        logger.error(f"Add wastage record error: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+# Food wastage data endpoints - Supabase integration disabled
+# @router.post("/wastage")
+# def add_wastage_record(record: WastageRecord, current_user: User = Depends(get_current_user)):
+#     try:
+#         data = record.dict()
+#         data["user_id"] = current_user.id  # Override user_id with authenticated user
+#         response = supabase.table("wastage_records").insert(data).execute()
+#         if response.get("error"):
+#             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response["error"]["message"])
+#         return {"message": "Wastage record added successfully"}
+#     except Exception as e:
+#         logger.error(f"Add wastage record error: {e}")
+#         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-@router.get("/wastage")
-def get_wastage_records(current_user: User = Depends(get_current_user)):
-    try:
-        response = supabase.table("wastage_records").select("*").eq("user_id", current_user.id).execute()
-        if response.get("error"):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response["error"]["message"])
-        return {"wastage_records": response.get("data", [])}
-    except Exception as e:
-        logger.error(f"Get wastage records error: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+# @router.get("/wastage")
+# def get_wastage_records(current_user: User = Depends(get_current_user)):
+#     try:
+#         response = supabase.table("wastage_records").select("*").eq("user_id", current_user.id).execute()
+#         if response.get("error"):
+#             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response["error"]["message"])
+#         return {"wastage_records": response.get("data", [])}
+#     except Exception as e:
+#         logger.error(f"Get wastage records error: {e}")
+#         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-@router.get("/wastage/analysis")
-def get_wastage_analysis(current_user: User = Depends(get_current_user)):
-    try:
-        # Basic example analysis: total quantity wasted per food item
-        response = supabase.table("wastage_records").select("food_item, quantity").eq("user_id", current_user.id).execute()
-        if response.get("error"):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response["error"]["message"])
-        data = response.get("data", [])
-        analysis = {}
-        for record in data:
-            food_item = record["food_item"]
-            quantity = record["quantity"]
-            analysis[food_item] = analysis.get(food_item, 0) + quantity
-        return {"analysis": analysis}
-    except Exception as e:
-        logger.error(f"Wastage analysis error: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+# @router.get("/wastage/analysis")
+# def get_wastage_analysis(current_user: User = Depends(get_current_user)):
+#     try:
+#         # Basic example analysis: total quantity wasted per food item
+#         response = supabase.table("wastage_records").select("food_item, quantity").eq("user_id", current_user.id).execute()
+#         if response.get("error"):
+#             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response["error"]["message"])
+#         data = response.get("data", [])
+#         analysis = {}
+#         for record in data:
+#             food_item = record["food_item"]
+#             quantity = record["quantity"]
+#             analysis[food_item] = analysis.get(food_item, 0) + quantity
+#         return {"analysis": analysis}
+#     except Exception as e:
+#         logger.error(f"Wastage analysis error: {e}")
+#         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 # Existing food alternatives endpoints
 @router.post('/food-alternatives')

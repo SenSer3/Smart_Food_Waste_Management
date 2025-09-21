@@ -5,7 +5,7 @@ This project is a backend API service for Smart Food Waste Management, designed 
 ## Hosted API Base URL
 
 The API is hosted at:  
-https://smart-food-waste-management.onrender.com
+https://food-management-backend-z51f.onrender.com
 
 ## Core Features
 
